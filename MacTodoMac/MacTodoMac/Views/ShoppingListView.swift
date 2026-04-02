@@ -5,130 +5,105 @@ import ViewModels
 
 struct ShoppingListView: View {
     @State private var viewModel: ShoppingListViewModel
-    @State private var inputText = ""
-    @State private var quantityText = ""
-    @State private var pendingName = ""
-    @State private var isEnteringQuantity = false
+    @State private var showingAddPanel = false
+    @State private var itemName = ""
+    @State private var itemQuantity = ""
+    private let store: WorkspaceStore
 
     init(store: WorkspaceStore) {
+        self.store = store
         _viewModel = State(initialValue: ShoppingListViewModel(store: store))
-    }
-
-    private var suggestions: [String] {
-        viewModel.autocompleteSuggestions(for: inputText)
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            // Input bar
-            inputBar
-                .padding()
+            // Header: "Shopping List" on left, "+" on right
+            HStack {
+                Text("Shopping List")
+                    .font(.title2.weight(.semibold))
+                Spacer()
+                Button {
+                    showingAddPanel.toggle()
+                    if !showingAddPanel {
+                        resetAddPanel()
+                    }
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .buttonStyle(.borderless)
+                .help("Add item")
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
 
             Divider()
 
-            // Badges
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    if !viewModel.activeItems.isEmpty {
-                        Text("To Buy")
-                            .font(.headline)
-                            .padding(.horizontal)
+            // Add panel (shown when + is pressed)
+            if showingAddPanel {
+                addPanel
+                    .padding(.horizontal)
+                    .padding(.vertical, 10)
+                    .background(.background.secondary)
+                Divider()
+            }
 
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 8)], spacing: 8) {
-                            ForEach(viewModel.activeItems) { item in
-                                ShoppingBadge(item: item, isPurchased: false) {
-                                    Task { await viewModel.togglePurchased(item) }
-                                } onDelete: {
-                                    Task { await viewModel.deleteItem(item) }
-                                }
+            // Shopping items list
+            List {
+                if !viewModel.activeItems.isEmpty {
+                    Section("To Buy") {
+                        ForEach(viewModel.activeItems) { item in
+                            ShoppingRow(item: item, isPurchased: false) {
+                                Task { await viewModel.togglePurchased(item) }
+                            } onDelete: {
+                                Task { await viewModel.deleteItem(item) }
                             }
                         }
-                        .padding(.horizontal)
-                    }
-
-                    if !viewModel.purchasedItems.isEmpty {
-                        Text("Purchased")
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 8)], spacing: 8) {
-                            ForEach(viewModel.purchasedItems) { item in
-                                ShoppingBadge(item: item, isPurchased: true) {
-                                    Task { await viewModel.togglePurchased(item) }
-                                } onDelete: {
-                                    Task { await viewModel.deleteItem(item) }
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    if viewModel.activeItems.isEmpty && viewModel.purchasedItems.isEmpty {
-                        ContentUnavailableView(
-                            "Shopping List Empty",
-                            systemImage: "cart",
-                            description: Text("Add items above to get started.")
-                        )
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 40)
                     }
                 }
-                .padding(.vertical)
+
+                if !viewModel.purchasedItems.isEmpty {
+                    Section("Purchased") {
+                        ForEach(viewModel.purchasedItems) { item in
+                            ShoppingRow(item: item, isPurchased: true) {
+                                Task { await viewModel.togglePurchased(item) }
+                            } onDelete: {
+                                Task { await viewModel.deleteItem(item) }
+                            }
+                        }
+                    }
+                }
+            }
+            .overlay {
+                if viewModel.activeItems.isEmpty && viewModel.purchasedItems.isEmpty {
+                    ContentUnavailableView(
+                        "Shopping List Empty",
+                        systemImage: "cart",
+                        description: Text("Press + to add items.")
+                    )
+                }
             }
         }
-        .navigationTitle("Shopping List")
     }
 
     @ViewBuilder
-    private var inputBar: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                if isEnteringQuantity {
-                    Text(pendingName)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(.blue.opacity(0.1))
-                        .clipShape(Capsule())
-
-                    TextField("Quantity (optional, e.g. 3 cans)", text: $quantityText)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit { addItem() }
-
-                    Button("Add") { addItem() }
-                        .buttonStyle(.borderedProminent)
-
-                    Button("Cancel") {
-                        isEnteringQuantity = false
-                        pendingName = ""
-                        quantityText = ""
-                    }
-                    .buttonStyle(.bordered)
-                } else {
-                    TextField("Add item...", text: $inputText)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit { confirmName() }
-
-                    Button("Add") { confirmName() }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(inputText.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
+    private var addPanel: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Line 1: Item name with autocomplete
+            TextField("Item name", text: $itemName)
+                .textFieldStyle(.roundedBorder)
 
             // Autocomplete suggestions
-            if !isEnteringQuantity && !suggestions.isEmpty {
+            let suggestions = viewModel.autocompleteSuggestions(for: itemName)
+            if !suggestions.isEmpty {
                 HStack(spacing: 6) {
                     ForEach(suggestions, id: \.self) { suggestion in
                         Button {
-                            inputText = suggestion
-                            confirmName()
+                            itemName = suggestion
                         } label: {
                             Text(suggestion)
                                 .font(.caption)
                                 .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
+                                .padding(.vertical, 3)
                                 .background(.secondary.opacity(0.15))
                                 .clipShape(Capsule())
                         }
@@ -136,38 +111,47 @@ struct ShoppingListView: View {
                     }
                 }
             }
-        }
-    }
 
-    private func confirmName() {
-        let name = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !name.isEmpty else { return }
-        pendingName = name
-        inputText = ""
-        isEnteringQuantity = true
+            // Line 2: Quantity / description
+            TextField("Quantity / description (optional)", text: $itemQuantity)
+                .textFieldStyle(.roundedBorder)
+
+            // Line 3: Add button
+            Button("Add") {
+                addItem()
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(itemName.trimmingCharacters(in: .whitespaces).isEmpty)
+        }
     }
 
     private func addItem() {
-        let qty = quantityText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let name = itemName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        let qty = itemQuantity.trimmingCharacters(in: .whitespacesAndNewlines)
         Task {
-            await viewModel.addItem(name: pendingName, quantity: qty.isEmpty ? nil : qty)
+            await viewModel.addItem(name: name, quantity: qty.isEmpty ? nil : qty)
         }
-        pendingName = ""
-        quantityText = ""
-        isEnteringQuantity = false
+        resetAddPanel()
+        showingAddPanel = false
+    }
+
+    private func resetAddPanel() {
+        itemName = ""
+        itemQuantity = ""
     }
 }
 
-// MARK: - Shopping Badge
+// MARK: - Shopping Row
 
-private struct ShoppingBadge: View {
+private struct ShoppingRow: View {
     let item: ShoppingItem
     let isPurchased: Bool
     let onToggle: () -> Void
     let onDelete: () -> Void
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack {
             Button(action: onToggle) {
                 Image(systemName: isPurchased ? "checkmark.circle.fill" : "circle")
                     .foregroundStyle(isPurchased ? .green : .secondary)
@@ -176,30 +160,22 @@ private struct ShoppingBadge: View {
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(item.name)
-                    .font(.callout)
-                    .fontWeight(.medium)
                     .strikethrough(isPurchased)
                     .foregroundStyle(isPurchased ? .secondary : .primary)
-
                 if let qty = item.quantity {
                     Text(qty)
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
 
-            Spacer(minLength: 4)
+            Spacer()
 
             Button(action: onDelete) {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(.secondary.opacity(0.6))
-                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(isPurchased ? Color.green.opacity(0.08) : Color.secondary.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
