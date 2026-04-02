@@ -111,4 +111,37 @@ public final class WorkspaceStore {
         get { workspace.collaborators }
         set { workspace.collaborators = newValue }
     }
+
+    // MARK: - Shopping Items
+
+    public var shoppingItems: [ShoppingItem] {
+        get { workspace.shoppingItems }
+        set { workspace.shoppingItems = newValue }
+    }
+
+    public func addShoppingItem(_ item: ShoppingItem) async {
+        workspace.shoppingItems.append(item)
+        await save()
+    }
+
+    public func updateShoppingItem(_ item: ShoppingItem) async {
+        if let index = workspace.shoppingItems.firstIndex(where: { $0.id == item.id }) {
+            workspace.shoppingItems[index] = item
+            await save()
+        }
+    }
+
+    public func deleteShoppingItem(id: UUID) async {
+        if let index = workspace.shoppingItems.firstIndex(where: { $0.id == id }) {
+            workspace.shoppingItems[index].isDeleted = true
+            await save()
+        }
+    }
+
+    public func toggleShoppingItemPurchased(id: UUID) async {
+        if let index = workspace.shoppingItems.firstIndex(where: { $0.id == id }) {
+            workspace.shoppingItems[index].togglePurchased()
+            await save()
+        }
+    }
 }

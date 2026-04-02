@@ -96,6 +96,48 @@ final class CodableRoundTripTests: XCTestCase {
         XCTAssertEqual(decoded.collaborators.count, 1)
     }
 
+    func testShoppingItemRoundTrip() throws {
+        let item = ShoppingItem(name: "Milk", quantity: "2 gallons", isPurchased: true, purchasedAt: Date())
+        let data = try encoder.encode(item)
+        let decoded = try decoder.decode(ShoppingItem.self, from: data)
+        XCTAssertEqual(decoded.id, item.id)
+        XCTAssertEqual(decoded.name, "Milk")
+        XCTAssertEqual(decoded.quantity, "2 gallons")
+        XCTAssertTrue(decoded.isPurchased)
+        XCTAssertNotNil(decoded.purchasedAt)
+        XCTAssertFalse(decoded.isDeleted)
+    }
+
+    func testShoppingItemMinimal() throws {
+        let item = ShoppingItem(name: "Eggs")
+        let data = try encoder.encode(item)
+        let decoded = try decoder.decode(ShoppingItem.self, from: data)
+        XCTAssertEqual(decoded.name, "Eggs")
+        XCTAssertNil(decoded.quantity)
+        XCTAssertFalse(decoded.isPurchased)
+    }
+
+    func testWorkspaceBackwardCompatibility() throws {
+        // Simulate old workspace JSON without shoppingItems
+        let json = """
+        {"id":"00000000-0000-0000-0000-000000000001","lastModified":"2026-01-01T00:00:00Z","items":[],"projects":[],"tags":[],"collaborators":[]}
+        """
+        let data = json.data(using: .utf8)!
+        let decoded = try decoder.decode(Workspace.self, from: data)
+        XCTAssertTrue(decoded.shoppingItems.isEmpty)
+    }
+
+    func testWorkspaceWithShoppingItems() throws {
+        let ws = Workspace(
+            items: [TodoItem(title: "Task")],
+            shoppingItems: [ShoppingItem(name: "Bread")]
+        )
+        let data = try encoder.encode(ws)
+        let decoded = try decoder.decode(Workspace.self, from: data)
+        XCTAssertEqual(decoded.shoppingItems.count, 1)
+        XCTAssertEqual(decoded.shoppingItems[0].name, "Bread")
+    }
+
     func testReminderWithAbsoluteDate() throws {
         let reminder = Reminder(triggerDate: Date())
         let data = try encoder.encode(reminder)

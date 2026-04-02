@@ -34,7 +34,7 @@ struct MacTodoMacApp: App {
                 }
                 .keyboardShortcut("n", modifiers: .command)
 
-                Button("New Project") {
+                Button("New ToDo List") {
                     NotificationCenter.default.post(name: .newProject, object: nil)
                 }
                 .keyboardShortcut("n", modifiers: [.command, .shift])

@@ -8,13 +8,19 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
-            Tab("Tasks", systemImage: "checklist") {
+            Tab("Shopping", systemImage: "cart.fill") {
                 NavigationStack {
-                    TaskListView(store: store)
+                    ShoppingListiOSView(store: store)
                 }
             }
 
-            Tab("Projects", systemImage: "folder.fill") {
+            Tab("Schedule", systemImage: "calendar") {
+                NavigationStack {
+                    ScheduleiOSView()
+                }
+            }
+
+            Tab("ToDo Lists", systemImage: "folder.fill") {
                 NavigationStack {
                     ProjectListView(store: store)
                 }

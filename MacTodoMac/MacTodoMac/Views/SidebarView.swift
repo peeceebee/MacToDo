@@ -6,8 +6,8 @@ import ViewModels
 struct SidebarView: View {
     @Binding var selectedItem: ContentView.SidebarItem?
     @State private var viewModel: ProjectListViewModel
-    @State private var showingNewProject = false
-    @State private var newProjectName = ""
+    @State private var showingNewTodoList = false
+    @State private var newTodoListName = ""
 
     init(selectedItem: Binding<ContentView.SidebarItem?>, store: WorkspaceStore) {
         _selectedItem = selectedItem
@@ -16,18 +16,19 @@ struct SidebarView: View {
 
     var body: some View {
         List(selection: $selectedItem) {
-            Section("Smart Filters") {
-                Label("All Tasks", systemImage: "tray.full")
-                    .tag(ContentView.SidebarItem.allTasks)
+            // Todays ToDo / PastDue Do (cycling)
+            todayToggleRow
 
-                Label("Today", systemImage: "calendar")
-                    .tag(ContentView.SidebarItem.today)
+            // Shopping List
+            Label("Shopping List", systemImage: "cart.fill")
+                .tag(ContentView.SidebarItem.shoppingList)
 
-                Label("Upcoming", systemImage: "calendar.badge.clock")
-                    .tag(ContentView.SidebarItem.upcoming)
-            }
+            // Schedule
+            Label("Schedule", systemImage: "calendar")
+                .tag(ContentView.SidebarItem.schedule)
 
-            Section("Projects") {
+            // ToDo Lists
+            Section("ToDo Lists") {
                 ForEach(viewModel.projects) { project in
                     Label {
                         HStack {
@@ -41,36 +42,63 @@ struct SidebarView: View {
                         Image(systemName: project.iconName)
                             .foregroundStyle(Color(hex: project.colorHex))
                     }
-                    .tag(ContentView.SidebarItem.project(project))
+                    .tag(ContentView.SidebarItem.todoList(project))
                 }
             }
         }
         .navigationTitle("MacTodo")
         .safeAreaInset(edge: .bottom) {
             Button {
-                showingNewProject = true
+                showingNewTodoList = true
             } label: {
-                Label("Add Project", systemImage: "plus.circle")
+                Label("Add ToDo List", systemImage: "plus.circle")
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                     .padding(.vertical, 8)
             }
             .buttonStyle(.plain)
         }
-        .alert("New Project", isPresented: $showingNewProject) {
-            TextField("Project name", text: $newProjectName)
+        .alert("New ToDo List", isPresented: $showingNewTodoList) {
+            TextField("ToDo List name", text: $newTodoListName)
             Button("Create") {
-                guard !newProjectName.isEmpty else { return }
+                guard !newTodoListName.isEmpty else { return }
                 Task {
-                    await viewModel.createProject(name: newProjectName)
-                    newProjectName = ""
+                    await viewModel.createProject(name: newTodoListName)
+                    newTodoListName = ""
                 }
             }
-            Button("Cancel", role: .cancel) { newProjectName = "" }
+            Button("Cancel", role: .cancel) { newTodoListName = "" }
         }
         .onReceive(NotificationCenter.default.publisher(for: .newProject)) { _ in
-            showingNewProject = true
+            showingNewTodoList = true
         }
+    }
+
+    @ViewBuilder
+    private var todayToggleRow: some View {
+        let isTodaySelected = selectedItem == .todaysTodo
+        let isPastDueSelected = selectedItem == .pastDueDo
+
+        Button {
+            if isTodaySelected {
+                selectedItem = .pastDueDo
+            } else if isPastDueSelected {
+                selectedItem = .todaysTodo
+            } else {
+                selectedItem = .todaysTodo
+            }
+        } label: {
+            Label {
+                Text(isTodaySelected || (!isTodaySelected && !isPastDueSelected) ? "Todays ToDo" : "PastDue Do")
+            } icon: {
+                Image(systemName: isPastDueSelected ? "exclamationmark.circle.fill" : "sun.max.fill")
+                    .foregroundStyle(isPastDueSelected ? .red : .orange)
+            }
+        }
+        .buttonStyle(.plain)
+        .listRowBackground(
+            (isTodaySelected || isPastDueSelected) ? Color.accentColor.opacity(0.15) : Color.clear
+        )
     }
 }
 
