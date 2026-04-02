@@ -9,9 +9,13 @@ struct TaskListMacView: View {
     @State private var viewModel: TaskListViewModel
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
+    @State private var isEditingName = false
+    @State private var editingName = ""
+    private let store: WorkspaceStore
 
     init(sidebarItem: ContentView.SidebarItem, selectedTask: Binding<TodoItem?>, store: WorkspaceStore) {
         self.sidebarItem = sidebarItem
+        self.store = store
         _selectedTask = selectedTask
         _viewModel = State(initialValue: TaskListViewModel(store: store))
     }
@@ -25,69 +29,64 @@ struct TaskListMacView: View {
         }
     }
 
-    private var currentProjectID: UUID? {
-        if case .todoList(let p) = sidebarItem { return p.id }
+    private var currentProject: Project? {
+        if case .todoList(let p) = sidebarItem { return p }
         return nil
     }
 
     var body: some View {
-        List(displayedItems, selection: $selectedTask) { item in
-            HStack {
-                Button {
-                    Task { await viewModel.toggleCompletion(item) }
-                } label: {
-                    Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                        .foregroundStyle(item.isCompleted ? .green : .secondary)
-                }
-                .buttonStyle(.plain)
+        VStack(spacing: 0) {
+            // Header bar: editable name on left, icons on right
+            headerBar
+                .padding(.horizontal)
+                .padding(.vertical, 8)
 
-                VStack(alignment: .leading) {
-                    Text(item.title)
-                        .strikethrough(item.isCompleted)
-                    if let dueDate = item.dueDate {
-                        Text(dueDate, style: .date)
-                            .font(.caption)
-                            .foregroundStyle(dueDate < Date() && !item.isCompleted ? .red : .secondary)
+            Divider()
+
+            // Task list
+            List(displayedItems, selection: $selectedTask) { item in
+                HStack {
+                    Button {
+                        Task { await viewModel.toggleCompletion(item) }
+                    } label: {
+                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(item.isCompleted ? .green : .secondary)
+                    }
+                    .buttonStyle(.plain)
+
+                    VStack(alignment: .leading) {
+                        Text(item.title)
+                            .strikethrough(item.isCompleted)
+                        if let dueDate = item.dueDate {
+                            Text(dueDate, style: .date)
+                                .font(.caption)
+                                .foregroundStyle(dueDate < Date() && !item.isCompleted ? .red : .secondary)
+                        }
+                    }
+
+                    Spacer()
+
+                    if item.priority != .none {
+                        Text(item.priority.label)
+                            .font(.caption2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(priorityColor(item.priority).opacity(0.2))
+                            .foregroundStyle(priorityColor(item.priority))
+                            .clipShape(Capsule())
                     }
                 }
-
-                Spacer()
-
-                if item.priority != .none {
-                    Text(item.priority.label)
-                        .font(.caption2)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(priorityColor(item.priority).opacity(0.2))
-                        .foregroundStyle(priorityColor(item.priority))
-                        .clipShape(Capsule())
-                }
+                .tag(item)
             }
-            .tag(item)
+            .searchable(text: $viewModel.searchText, prompt: "Search tasks")
         }
-        .navigationTitle(sidebarTitle)
-        .searchable(text: $viewModel.searchText, prompt: "Search tasks")
-        .toolbar {
-            ToolbarItemGroup {
-                Toggle(isOn: $viewModel.showCompleted) {
-                    Image(systemName: viewModel.showCompleted ? "eye.fill" : "eye.slash")
-                }
-                .help("Show completed tasks")
-
-                Button {
-                    showingAddTask = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-                .help("New task")
-            }
-        }
+        .navigationBarBackButtonHidden(true)
         .alert("New Task", isPresented: $showingAddTask) {
             TextField("Task title", text: $newTaskTitle)
             Button("Add") {
                 guard !newTaskTitle.isEmpty else { return }
                 Task {
-                    await viewModel.addTask(title: newTaskTitle, projectID: projectIDForNewTask)
+                    await viewModel.addTask(title: newTaskTitle, projectID: currentProject?.id)
                     newTaskTitle = ""
                 }
             }
@@ -106,16 +105,67 @@ struct TaskListMacView: View {
         }
     }
 
-    private var sidebarTitle: String {
-        switch sidebarItem {
-        case .todoList(let p): p.name
-        default: "Tasks"
+    @ViewBuilder
+    private var headerBar: some View {
+        HStack {
+            // Editable todo list name
+            if isEditingName {
+                TextField("ToDo List name", text: $editingName, onCommit: {
+                    saveEditedName()
+                })
+                .textFieldStyle(.roundedBorder)
+                .font(.title2.weight(.semibold))
+                .frame(maxWidth: 300)
+                .onExitCommand { cancelEditing() }
+            } else {
+                Text(currentProject?.name ?? "Tasks")
+                    .font(.title2.weight(.semibold))
+                    .onTapGesture {
+                        if let project = currentProject {
+                            editingName = project.name
+                            isEditingName = true
+                        }
+                    }
+            }
+
+            Spacer()
+
+            // Show completed toggle
+            Button {
+                viewModel.showCompleted.toggle()
+            } label: {
+                Image(systemName: viewModel.showCompleted ? "eye.fill" : "eye.slash")
+            }
+            .buttonStyle(.borderless)
+            .help(viewModel.showCompleted ? "Hide completed" : "Show completed")
+
+            // New task button
+            Button {
+                showingAddTask = true
+            } label: {
+                Image(systemName: "plus")
+            }
+            .buttonStyle(.borderless)
+            .help("New task")
         }
     }
 
-    private var projectIDForNewTask: UUID? {
-        if case .todoList(let p) = sidebarItem { return p.id }
-        return nil
+    private func saveEditedName() {
+        guard let project = currentProject else { return }
+        let newName = editingName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !newName.isEmpty else {
+            cancelEditing()
+            return
+        }
+        var updated = project
+        updated.name = newName
+        Task { await store.updateProject(updated) }
+        isEditingName = false
+    }
+
+    private func cancelEditing() {
+        isEditingName = false
+        editingName = ""
     }
 
     private func priorityColor(_ priority: Priority) -> Color {

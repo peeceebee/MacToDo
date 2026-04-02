@@ -7,22 +7,26 @@ struct ProjectListView: View {
     @State private var viewModel: ProjectListViewModel
     @State private var showingNewProject = false
     @State private var newProjectName = ""
+    private let store: WorkspaceStore
 
     init(store: WorkspaceStore) {
+        self.store = store
         _viewModel = State(initialValue: ProjectListViewModel(store: store))
     }
 
     var body: some View {
         List {
             ForEach(viewModel.projects) { project in
-                HStack {
-                    Image(systemName: project.iconName)
-                        .foregroundStyle(Color(hex: project.colorHex))
-                    Text(project.name)
-                    Spacer()
-                    Text("\(viewModel.taskCount(for: project))")
-                        .foregroundStyle(.secondary)
-                        .font(.caption)
+                NavigationLink(value: project) {
+                    HStack {
+                        Image(systemName: project.iconName)
+                            .foregroundStyle(Color(hex: project.colorHex))
+                        Text(project.name)
+                        Spacer()
+                        Text("\(viewModel.taskCount(for: project))")
+                            .foregroundStyle(.secondary)
+                            .font(.caption)
+                    }
                 }
                 .swipeActions(edge: .trailing) {
                     Button("Archive", role: .destructive) {
@@ -32,6 +36,9 @@ struct ProjectListView: View {
             }
         }
         .navigationTitle("ToDo Lists")
+        .navigationDestination(for: Project.self) { project in
+            TaskListView(project: project, store: store)
+        }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {

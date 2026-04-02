@@ -7,16 +7,24 @@ struct TaskListView: View {
     @State private var viewModel: TaskListViewModel
     @State private var newTaskTitle = ""
     @State private var showingAddTask = false
+    @State private var isEditingName = false
+    @State private var editingName = ""
     private let store: WorkspaceStore
+    private let project: Project
 
-    init(store: WorkspaceStore) {
+    init(project: Project, store: WorkspaceStore) {
+        self.project = project
         self.store = store
         _viewModel = State(initialValue: TaskListViewModel(store: store))
     }
 
+    private var displayedItems: [TodoItem] {
+        viewModel.filteredItems.filter { $0.projectID == project.id }
+    }
+
     var body: some View {
         List {
-            ForEach(viewModel.filteredItems) { item in
+            ForEach(displayedItems) { item in
                 NavigationLink(value: item) {
                     TaskRow(item: item)
                 }
@@ -37,7 +45,8 @@ struct TaskListView: View {
                 }
             }
         }
-        .navigationTitle("Tasks")
+        .navigationTitle(isEditingName ? "" : project.name)
+        .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: TodoItem.self) { item in
             TaskDetailView(item: item, store: store)
         }
@@ -46,15 +55,33 @@ struct TaskListView: View {
             await viewModel.loadTasks()
         }
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: .principal) {
+                if isEditingName {
+                    TextField("ToDo List name", text: $editingName)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: 200)
+                        .onSubmit { saveEditedName() }
+                } else {
+                    Text(project.name)
+                        .font(.headline)
+                        .onTapGesture(count: 1) {
+                            editingName = project.name
+                            isEditingName = true
+                        }
+                }
+            }
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    viewModel.showCompleted.toggle()
+                } label: {
+                    Image(systemName: viewModel.showCompleted ? "eye.fill" : "eye.slash")
+                }
+
                 Button {
                     showingAddTask = true
                 } label: {
                     Image(systemName: "plus")
                 }
-            }
-            ToolbarItem(placement: .secondaryAction) {
-                Toggle("Show Completed", isOn: $viewModel.showCompleted)
             }
         }
         .alert("New Task", isPresented: $showingAddTask) {
@@ -62,12 +89,24 @@ struct TaskListView: View {
             Button("Add") {
                 guard !newTaskTitle.isEmpty else { return }
                 Task {
-                    await viewModel.addTask(title: newTaskTitle)
+                    await viewModel.addTask(title: newTaskTitle, projectID: project.id)
                     newTaskTitle = ""
                 }
             }
             Button("Cancel", role: .cancel) { newTaskTitle = "" }
         }
+    }
+
+    private func saveEditedName() {
+        let newName = editingName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !newName.isEmpty else {
+            isEditingName = false
+            return
+        }
+        var updated = project
+        updated.name = newName
+        Task { await store.updateProject(updated) }
+        isEditingName = false
     }
 }
 
