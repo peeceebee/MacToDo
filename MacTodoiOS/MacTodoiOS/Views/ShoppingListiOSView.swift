@@ -5,55 +5,31 @@ import ViewModels
 
 struct ShoppingListiOSView: View {
     @State private var viewModel: ShoppingListViewModel
-    @State private var inputText = ""
-    @State private var quantityText = ""
-    @State private var pendingName = ""
-    @State private var isEnteringQuantity = false
+    @State private var showingAddPanel = false
+    @State private var itemName = ""
+    @State private var itemQuantity = ""
+    private let store: WorkspaceStore
 
     init(store: WorkspaceStore) {
+        self.store = store
         _viewModel = State(initialValue: ShoppingListViewModel(store: store))
-    }
-
-    private var suggestions: [String] {
-        viewModel.autocompleteSuggestions(for: inputText)
     }
 
     var body: some View {
         List {
-            // Input section
-            Section {
-                if isEnteringQuantity {
-                    HStack {
-                        Text(pendingName)
-                            .fontWeight(.medium)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(.blue.opacity(0.1))
-                            .clipShape(Capsule())
-                        Spacer()
-                    }
-                    TextField("Quantity (optional, e.g. 3 cans)", text: $quantityText)
-                        .onSubmit { addItem() }
-                    HStack {
-                        Button("Add") { addItem() }
-                            .buttonStyle(.borderedProminent)
-                        Button("Cancel") {
-                            isEnteringQuantity = false
-                            pendingName = ""
-                            quantityText = ""
-                        }
-                    }
-                } else {
-                    TextField("Add item...", text: $inputText)
-                        .onSubmit { confirmName() }
+            // Add panel (shown when + is pressed)
+            if showingAddPanel {
+                Section {
+                    TextField("Item name", text: $itemName)
 
+                    // Autocomplete suggestions
+                    let suggestions = viewModel.autocompleteSuggestions(for: itemName)
                     if !suggestions.isEmpty {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 6) {
                                 ForEach(suggestions, id: \.self) { suggestion in
                                     Button {
-                                        inputText = suggestion
-                                        confirmName()
+                                        itemName = suggestion
                                     } label: {
                                         Text(suggestion)
                                             .font(.caption)
@@ -67,6 +43,13 @@ struct ShoppingListiOSView: View {
                             }
                         }
                     }
+
+                    TextField("Quantity / description (optional)", text: $itemQuantity)
+
+                    Button("Add") {
+                        addItem()
+                    }
+                    .disabled(itemName.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
 
@@ -97,33 +80,43 @@ struct ShoppingListiOSView: View {
             }
         }
         .navigationTitle("Shopping List")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingAddPanel.toggle()
+                    if !showingAddPanel {
+                        resetAddPanel()
+                    }
+                } label: {
+                    Image(systemName: showingAddPanel ? "xmark" : "plus")
+                }
+            }
+        }
         .overlay {
-            if viewModel.activeItems.isEmpty && viewModel.purchasedItems.isEmpty && !isEnteringQuantity {
+            if viewModel.activeItems.isEmpty && viewModel.purchasedItems.isEmpty && !showingAddPanel {
                 ContentUnavailableView(
                     "Shopping List Empty",
                     systemImage: "cart",
-                    description: Text("Add items above to get started.")
+                    description: Text("Press + to add items.")
                 )
             }
         }
     }
 
-    private func confirmName() {
-        let name = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func addItem() {
+        let name = itemName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return }
-        pendingName = name
-        inputText = ""
-        isEnteringQuantity = true
+        let qty = itemQuantity.trimmingCharacters(in: .whitespacesAndNewlines)
+        Task {
+            await viewModel.addItem(name: name, quantity: qty.isEmpty ? nil : qty)
+        }
+        resetAddPanel()
+        showingAddPanel = false
     }
 
-    private func addItem() {
-        let qty = quantityText.trimmingCharacters(in: .whitespacesAndNewlines)
-        Task {
-            await viewModel.addItem(name: pendingName, quantity: qty.isEmpty ? nil : qty)
-        }
-        pendingName = ""
-        quantityText = ""
-        isEnteringQuantity = false
+    private func resetAddPanel() {
+        itemName = ""
+        itemQuantity = ""
     }
 }
 
