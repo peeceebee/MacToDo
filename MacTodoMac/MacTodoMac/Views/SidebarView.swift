@@ -14,20 +14,38 @@ struct SidebarView: View {
         _viewModel = State(initialValue: ProjectListViewModel(store: store))
     }
 
+    private var todayLabel: String {
+        selectedItem == .pastDueDo ? "PastDue Do" : "Todays ToDo"
+    }
+
+    private var todayIcon: String {
+        selectedItem == .pastDueDo ? "exclamationmark.circle.fill" : "sun.max.fill"
+    }
+
+    private var todayTag: ContentView.SidebarItem {
+        selectedItem == .pastDueDo ? .pastDueDo : .todaysTodo
+    }
+
     var body: some View {
         List(selection: $selectedItem) {
-            // Todays ToDo / PastDue Do (cycling)
-            todayToggleRow
+            // Fixed order: Todays ToDo, Shopping List, Schedule, ToDo Lists
+            Label(todayLabel, systemImage: todayIcon)
+                .tag(todayTag)
+                .onTapGesture(count: 2) {
+                    // Double-click cycles between Todays ToDo and PastDue Do
+                    if selectedItem == .todaysTodo {
+                        selectedItem = .pastDueDo
+                    } else {
+                        selectedItem = .todaysTodo
+                    }
+                }
 
-            // Shopping List
             Label("Shopping List", systemImage: "cart.fill")
                 .tag(ContentView.SidebarItem.shoppingList)
 
-            // Schedule
             Label("Schedule", systemImage: "calendar")
                 .tag(ContentView.SidebarItem.schedule)
 
-            // ToDo Lists
             Section("ToDo Lists") {
                 ForEach(viewModel.projects) { project in
                     Label {
@@ -72,33 +90,6 @@ struct SidebarView: View {
         .onReceive(NotificationCenter.default.publisher(for: .newProject)) { _ in
             showingNewTodoList = true
         }
-    }
-
-    @ViewBuilder
-    private var todayToggleRow: some View {
-        let isTodaySelected = selectedItem == .todaysTodo
-        let isPastDueSelected = selectedItem == .pastDueDo
-
-        Button {
-            if isTodaySelected {
-                selectedItem = .pastDueDo
-            } else if isPastDueSelected {
-                selectedItem = .todaysTodo
-            } else {
-                selectedItem = .todaysTodo
-            }
-        } label: {
-            Label {
-                Text(isTodaySelected || (!isTodaySelected && !isPastDueSelected) ? "Todays ToDo" : "PastDue Do")
-            } icon: {
-                Image(systemName: isPastDueSelected ? "exclamationmark.circle.fill" : "sun.max.fill")
-                    .foregroundStyle(isPastDueSelected ? .red : .orange)
-            }
-        }
-        .buttonStyle(.plain)
-        .listRowBackground(
-            (isTodaySelected || isPastDueSelected) ? Color.accentColor.opacity(0.15) : Color.clear
-        )
     }
 }
 
