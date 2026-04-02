@@ -10,10 +10,10 @@ struct TaskListMacView: View {
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
 
-    init(sidebarItem: ContentView.SidebarItem, selectedTask: Binding<TodoItem?>, syncEngine: SyncEngine, workspaceID: UUID) {
+    init(sidebarItem: ContentView.SidebarItem, selectedTask: Binding<TodoItem?>, store: WorkspaceStore) {
         self.sidebarItem = sidebarItem
         _selectedTask = selectedTask
-        _viewModel = State(initialValue: TaskListViewModel(syncEngine: syncEngine, workspaceID: workspaceID))
+        _viewModel = State(initialValue: TaskListViewModel(store: store))
     }
 
     private var displayedItems: [TodoItem] {
@@ -98,9 +98,6 @@ struct TaskListMacView: View {
                 }
             }
             Button("Cancel", role: .cancel) { newTaskTitle = "" }
-        }
-        .task {
-            await viewModel.loadTasks()
         }
         .onReceive(NotificationCenter.default.publisher(for: .newTask)) { _ in
             showingAddTask = true

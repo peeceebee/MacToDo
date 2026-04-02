@@ -8,8 +8,8 @@ struct ProjectListView: View {
     @State private var showingNewProject = false
     @State private var newProjectName = ""
 
-    init(syncEngine: SyncEngine, workspaceID: UUID) {
-        _viewModel = State(initialValue: ProjectListViewModel(syncEngine: syncEngine, workspaceID: workspaceID))
+    init(store: WorkspaceStore) {
+        _viewModel = State(initialValue: ProjectListViewModel(store: store))
     }
 
     var body: some View {
@@ -51,9 +51,6 @@ struct ProjectListView: View {
                 }
             }
             Button("Cancel", role: .cancel) { newProjectName = "" }
-        }
-        .task {
-            await viewModel.loadProjects()
         }
     }
 }

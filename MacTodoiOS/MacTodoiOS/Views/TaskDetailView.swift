@@ -7,10 +7,8 @@ struct TaskDetailView: View {
     @State private var viewModel: TaskDetailViewModel
     @Environment(\.dismiss) private var dismiss
 
-    init(item: TodoItem, workspace: Workspace, syncEngine: SyncEngine?) {
-        // SyncEngine passed through properly in real usage
-        let engine = syncEngine ?? SyncEngine(remote: LocalCacheService(), local: LocalCacheService())
-        _viewModel = State(initialValue: TaskDetailViewModel(item: item, workspace: workspace, syncEngine: engine))
+    init(item: TodoItem, store: WorkspaceStore) {
+        _viewModel = State(initialValue: TaskDetailViewModel(item: item, store: store))
     }
 
     var body: some View {

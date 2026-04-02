@@ -10,18 +10,16 @@ public final class SettingsViewModel {
     public var storageAccountName: String = ""
     public var isSyncing: Bool = false
 
-    private let syncEngine: SyncEngine
-    private let workspaceID: UUID
+    private let store: WorkspaceStore
     private let localCache: LocalCacheService
 
-    public init(syncEngine: SyncEngine, workspaceID: UUID, localCache: LocalCacheService) {
-        self.syncEngine = syncEngine
-        self.workspaceID = workspaceID
+    public init(store: WorkspaceStore, localCache: LocalCacheService) {
+        self.store = store
         self.localCache = localCache
     }
 
     public func refresh() async {
-        let status = await syncEngine.syncStatus
+        let status = await store.syncStatus
         switch status {
         case .idle:
             syncStatusText = "Synced"
@@ -33,21 +31,20 @@ public final class SettingsViewModel {
             syncStatusText = msg
             isSyncing = false
         }
-        lastSyncDate = localCache.lastSyncDate(for: workspaceID)
+        lastSyncDate = localCache.lastSyncDate(for: store.workspaceID)
     }
 
     public func syncNow() async {
         isSyncing = true
         syncStatusText = "Syncing..."
-        await syncEngine.sync(workspaceID: workspaceID)
+        await store.sync()
         await refresh()
     }
 
     public func exportData() async -> Data? {
-        let ws = await syncEngine.loadWorkspace(id: workspaceID)
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        return try? encoder.encode(ws)
+        return try? encoder.encode(store.workspace)
     }
 }
