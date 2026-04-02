@@ -34,6 +34,7 @@ struct ContentView: View {
                     item: task,
                     store: store
                 )
+                .id(task.id) // Force view recreation when selection changes
             } else {
                 ContentUnavailableView("Select a Task", systemImage: "checklist", description: Text("Choose a task from the list to view its details."))
             }
