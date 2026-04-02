@@ -46,7 +46,7 @@ struct SidebarView: View {
             Label("Schedule", systemImage: "calendar")
                 .tag(ContentView.SidebarItem.schedule)
 
-            Section("ToDo Lists") {
+            DisclosureGroup {
                 ForEach(viewModel.projects) { project in
                     Label {
                         HStack {
@@ -62,6 +62,8 @@ struct SidebarView: View {
                     }
                     .tag(ContentView.SidebarItem.todoList(project))
                 }
+            } label: {
+                Label("ToDo Lists", systemImage: "folder.fill")
             }
         }
         .navigationTitle("MacTodo")
