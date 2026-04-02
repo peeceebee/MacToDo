@@ -17,23 +17,17 @@ struct TaskListMacView: View {
     }
 
     private var displayedItems: [TodoItem] {
-        let calendar = Calendar.current
         switch sidebarItem {
-        case .allTasks:
-            return viewModel.filteredItems
-        case .today:
-            return viewModel.filteredItems.filter { item in
-                guard let dueDate = item.dueDate else { return false }
-                return calendar.isDateInToday(dueDate)
-            }
-        case .upcoming:
-            return viewModel.filteredItems.filter { item in
-                guard let dueDate = item.dueDate else { return false }
-                return dueDate > Date()
-            }
-        case .project(let project):
+        case .todoList(let project):
             return viewModel.filteredItems.filter { $0.projectID == project.id }
+        default:
+            return viewModel.filteredItems
         }
+    }
+
+    private var currentProjectID: UUID? {
+        if case .todoList(let p) = sidebarItem { return p.id }
+        return nil
     }
 
     var body: some View {
@@ -114,15 +108,13 @@ struct TaskListMacView: View {
 
     private var sidebarTitle: String {
         switch sidebarItem {
-        case .allTasks: "All Tasks"
-        case .today: "Today"
-        case .upcoming: "Upcoming"
-        case .project(let p): p.name
+        case .todoList(let p): p.name
+        default: "Tasks"
         }
     }
 
     private var projectIDForNewTask: UUID? {
-        if case .project(let p) = sidebarItem { return p.id }
+        if case .todoList(let p) = sidebarItem { return p.id }
         return nil
     }
 

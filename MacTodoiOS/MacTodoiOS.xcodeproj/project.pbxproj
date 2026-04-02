@@ -10,16 +10,20 @@
 		2201469C0539A22FCCB9B194 /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC856192AE540E7CC7113C25 /* TaskDetailView.swift */; };
 		240B4F4CE57DFE2585A7F444 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A369D488DA826A138C9E68 /* SettingsView.swift */; };
 		2E2A9B32C93F14EAD0408709 /* ViewModels in Frameworks */ = {isa = PBXBuildFile; productRef = 98827E5DCF5265247824E5BC /* ViewModels */; };
+		5A8775988CB4C09343C9696F /* ShoppingListiOSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2359ABFC5723351761C8E272 /* ShoppingListiOSView.swift */; };
 		A2870D3794E539D78DF07DD3 /* ProjectListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D288C2742325DD83885F6CF /* ProjectListView.swift */; };
 		B90D92B3D7358E34E415FB41 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = 24B2405A65096EF3F145F0CB /* Models */; };
 		C157D722A59F15943EABDA7D /* MacTodoiOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8DA4A528F052CEB41065C2 /* MacTodoiOSApp.swift */; };
 		C8DA7588FCBA8C725786FD02 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 8600F857045C6491ED9DE157 /* Storage */; };
 		DF2934BB8A05667CB72C75D7 /* TaskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18517C29CDCDC55C05767B23 /* TaskListView.swift */; };
 		E315C55039C13BEC87B42E55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7825B20548A5ECF994D2D4 /* ContentView.swift */; };
+		E5F8F0407A5A008B58947B8B /* ScheduleiOSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3233710E31D444D0ABAC12 /* ScheduleiOSView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		18517C29CDCDC55C05767B23 /* TaskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListView.swift; sourceTree = "<group>"; };
+		2359ABFC5723351761C8E272 /* ShoppingListiOSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListiOSView.swift; sourceTree = "<group>"; };
+		5C3233710E31D444D0ABAC12 /* ScheduleiOSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleiOSView.swift; sourceTree = "<group>"; };
 		7F8DA4A528F052CEB41065C2 /* MacTodoiOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacTodoiOSApp.swift; sourceTree = "<group>"; };
 		9D288C2742325DD83885F6CF /* ProjectListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectListView.swift; sourceTree = "<group>"; };
 		AE7825B20548A5ECF994D2D4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -47,7 +51,9 @@
 			isa = PBXGroup;
 			children = (
 				9D288C2742325DD83885F6CF /* ProjectListView.swift */,
+				5C3233710E31D444D0ABAC12 /* ScheduleiOSView.swift */,
 				D1A369D488DA826A138C9E68 /* SettingsView.swift */,
+				2359ABFC5723351761C8E272 /* ShoppingListiOSView.swift */,
 				CC856192AE540E7CC7113C25 /* TaskDetailView.swift */,
 				18517C29CDCDC55C05767B23 /* TaskListView.swift */,
 			);
@@ -177,7 +183,9 @@
 				E315C55039C13BEC87B42E55 /* ContentView.swift in Sources */,
 				C157D722A59F15943EABDA7D /* MacTodoiOSApp.swift in Sources */,
 				A2870D3794E539D78DF07DD3 /* ProjectListView.swift in Sources */,
+				E5F8F0407A5A008B58947B8B /* ScheduleiOSView.swift in Sources */,
 				240B4F4CE57DFE2585A7F444 /* SettingsView.swift in Sources */,
+				5A8775988CB4C09343C9696F /* ShoppingListiOSView.swift in Sources */,
 				2201469C0539A22FCCB9B194 /* TaskDetailView.swift in Sources */,
 				DF2934BB8A05667CB72C75D7 /* TaskListView.swift in Sources */,
 			);

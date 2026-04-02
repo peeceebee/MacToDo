@@ -6,14 +6,15 @@ import ViewModels
 struct ContentView: View {
     let store: WorkspaceStore
 
-    @State private var selectedSidebarItem: SidebarItem? = .allTasks
+    @State private var selectedSidebarItem: SidebarItem? = .todaysTodo
     @State private var selectedTask: TodoItem?
 
     enum SidebarItem: Hashable {
-        case allTasks
-        case today
-        case upcoming
-        case project(Project)
+        case todaysTodo
+        case pastDueDo
+        case shoppingList
+        case schedule
+        case todoList(Project)
     }
 
     var body: some View {
@@ -23,18 +24,31 @@ struct ContentView: View {
                 store: store
             )
         } content: {
-            TaskListMacView(
-                sidebarItem: selectedSidebarItem ?? .allTasks,
-                selectedTask: $selectedTask,
-                store: store
-            )
+            switch selectedSidebarItem {
+            case .shoppingList:
+                ShoppingListView(store: store)
+            case .schedule:
+                SchedulePlaceholderView()
+            case .todaysTodo:
+                TodayTasksView(mode: .today, selectedTask: $selectedTask, store: store)
+            case .pastDueDo:
+                TodayTasksView(mode: .pastDue, selectedTask: $selectedTask, store: store)
+            case .todoList(let project):
+                TaskListMacView(
+                    sidebarItem: .todoList(project),
+                    selectedTask: $selectedTask,
+                    store: store
+                )
+            case nil:
+                ContentUnavailableView("Select an Item", systemImage: "sidebar.left", description: Text("Choose from the sidebar."))
+            }
         } detail: {
             if let task = selectedTask {
                 TaskDetailMacView(
                     item: task,
                     store: store
                 )
-                .id(task.id) // Force view recreation when selection changes
+                .id(task.id)
             } else {
                 ContentUnavailableView("Select a Task", systemImage: "checklist", description: Text("Choose a task from the list to view its details."))
             }

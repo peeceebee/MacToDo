@@ -31,7 +31,7 @@ struct ProjectListView: View {
                 }
             }
         }
-        .navigationTitle("Projects")
+        .navigationTitle("ToDo Lists")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -41,8 +41,8 @@ struct ProjectListView: View {
                 }
             }
         }
-        .alert("New Project", isPresented: $showingNewProject) {
-            TextField("Project name", text: $newProjectName)
+        .alert("New ToDo List", isPresented: $showingNewProject) {
+            TextField("ToDo List name", text: $newProjectName)
             Button("Create") {
                 guard !newProjectName.isEmpty else { return }
                 Task {
