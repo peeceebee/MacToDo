@@ -1,0 +1,42 @@
+name: MacTodoMac
+options:
+  bundleIdPrefix: com.peeceebee
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+
+packages:
+  MacTodoCore:
+    path: ../MacTodoCore
+
+targets:
+  MacTodoMac:
+    type: application
+    platform: macOS
+    sources:
+      - MacTodoMac
+    dependencies:
+      - package: MacTodoCore
+        product: Models
+      - package: MacTodoCore
+        product: Storage
+      - package: MacTodoCore
+        product: ViewModels
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.peeceebee.MacTodoMac
+        PRODUCT_NAME: MacTodo
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.productivity"
+    preBuildScripts:
+      - name: Generate Azure Config
+        script: |
+          if [ -f "${SRCROOT}/../.env" ]; then
+            export $(grep -v '^#' "${SRCROOT}/../.env" | xargs)
+          fi
+          "${SRCROOT}/../Scripts/generate-config.sh"
+        outputFiles:
+          - $(SRCROOT)/MacTodoMac/GeneratedConfig.swift
