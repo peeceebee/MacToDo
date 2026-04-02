@@ -5,9 +5,7 @@ import ViewModels
 
 @main
 struct MacTodoMacApp: App {
-    @State private var syncEngine: SyncEngine
-    @State private var localCache: LocalCacheService
-    @State private var workspaceID: UUID
+    @State private var store: WorkspaceStore
 
     init() {
         let localCache = LocalCacheService()
@@ -20,14 +18,14 @@ struct MacTodoMacApp: App {
             remote = localCache
         }
 
-        self._syncEngine = State(initialValue: SyncEngine(remote: remote, local: localCache))
-        self._localCache = State(initialValue: localCache)
-        self._workspaceID = State(initialValue: workspaceID)
+        let syncEngine = SyncEngine(remote: remote, local: localCache)
+        self._store = State(initialValue: WorkspaceStore(syncEngine: syncEngine, workspaceID: workspaceID))
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView(syncEngine: syncEngine, workspaceID: workspaceID, localCache: localCache)
+            ContentView(store: store)
+                .task { await store.load() }
         }
         .commands {
             CommandGroup(after: .newItem) {
@@ -44,7 +42,7 @@ struct MacTodoMacApp: App {
         }
 
         Settings {
-            SettingsPane(syncEngine: syncEngine, workspaceID: workspaceID, localCache: localCache)
+            SettingsPane(store: store)
         }
     }
 }

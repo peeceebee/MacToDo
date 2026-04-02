@@ -6,46 +6,29 @@ import Storage
 @Observable
 public final class TaskDetailViewModel {
     public var item: TodoItem
-    public var availableProjects: [Project]
-    public var availableTags: [Tag]
+    public var availableProjects: [Project] { store.projects }
+    public var availableTags: [Tag] { store.tags }
 
-    private let syncEngine: SyncEngine
-    private let workspaceID: UUID
-    private var workspace: Workspace?
+    private let store: WorkspaceStore
 
-    public init(item: TodoItem, workspace: Workspace, syncEngine: SyncEngine) {
+    public init(item: TodoItem, store: WorkspaceStore) {
         self.item = item
-        self.availableProjects = workspace.projects
-        self.availableTags = workspace.tags
-        self.syncEngine = syncEngine
-        self.workspaceID = workspace.id
-        self.workspace = workspace
+        self.store = store
     }
 
     public func save() async {
-        guard var ws = workspace else { return }
-        if let index = ws.items.firstIndex(where: { $0.id == item.id }) {
-            item.updatedAt = Date()
-            ws.items[index] = item
-        }
-        self.workspace = ws
-        await syncEngine.saveWorkspace(ws)
+        await store.updateItem(item)
     }
 
     public func addSubtask(title: String) async {
-        guard var ws = workspace else { return }
         let subtask = TodoItem(
             title: title,
             parentTaskID: item.id,
             sortOrder: item.subtaskIDs.count
         )
         item.subtaskIDs.append(subtask.id)
-        ws.items.append(subtask)
-        if let index = ws.items.firstIndex(where: { $0.id == item.id }) {
-            ws.items[index] = item
-        }
-        self.workspace = ws
-        await syncEngine.saveWorkspace(ws)
+        await store.addItem(subtask)
+        await store.updateItem(item)
     }
 
     public func addReminder(_ reminder: Reminder) async {

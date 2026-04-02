@@ -7,9 +7,11 @@ struct TaskListView: View {
     @State private var viewModel: TaskListViewModel
     @State private var newTaskTitle = ""
     @State private var showingAddTask = false
+    private let store: WorkspaceStore
 
-    init(syncEngine: SyncEngine, workspaceID: UUID) {
-        _viewModel = State(initialValue: TaskListViewModel(syncEngine: syncEngine, workspaceID: workspaceID))
+    init(store: WorkspaceStore) {
+        self.store = store
+        _viewModel = State(initialValue: TaskListViewModel(store: store))
     }
 
     var body: some View {
@@ -37,9 +39,7 @@ struct TaskListView: View {
         }
         .navigationTitle("Tasks")
         .navigationDestination(for: TodoItem.self) { item in
-            if let workspace = viewModel.workspace {
-                TaskDetailView(item: item, workspace: workspace, syncEngine: viewModel.filteredItems.isEmpty ? nil : nil)
-            }
+            TaskDetailView(item: item, store: store)
         }
         .searchable(text: $viewModel.searchText, prompt: "Search tasks")
         .refreshable {
@@ -67,9 +67,6 @@ struct TaskListView: View {
                 }
             }
             Button("Cancel", role: .cancel) { newTaskTitle = "" }
-        }
-        .task {
-            await viewModel.loadTasks()
         }
     }
 }

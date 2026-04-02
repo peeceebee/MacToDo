@@ -4,9 +4,7 @@ import Storage
 import ViewModels
 
 struct ContentView: View {
-    let syncEngine: SyncEngine
-    let workspaceID: UUID
-    let localCache: LocalCacheService
+    let store: WorkspaceStore
 
     @State private var selectedSidebarItem: SidebarItem? = .allTasks
     @State private var selectedTask: TodoItem?
@@ -22,22 +20,19 @@ struct ContentView: View {
         NavigationSplitView {
             SidebarView(
                 selectedItem: $selectedSidebarItem,
-                syncEngine: syncEngine,
-                workspaceID: workspaceID
+                store: store
             )
         } content: {
             TaskListMacView(
                 sidebarItem: selectedSidebarItem ?? .allTasks,
                 selectedTask: $selectedTask,
-                syncEngine: syncEngine,
-                workspaceID: workspaceID
+                store: store
             )
         } detail: {
             if let task = selectedTask {
                 TaskDetailMacView(
                     item: task,
-                    syncEngine: syncEngine,
-                    workspaceID: workspaceID
+                    store: store
                 )
             } else {
                 ContentUnavailableView("Select a Task", systemImage: "checklist", description: Text("Choose a task from the list to view its details."))

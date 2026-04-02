@@ -5,8 +5,8 @@ import ViewModels
 struct SettingsPane: View {
     @State private var viewModel: SettingsViewModel
 
-    init(syncEngine: SyncEngine, workspaceID: UUID, localCache: LocalCacheService) {
-        _viewModel = State(initialValue: SettingsViewModel(syncEngine: syncEngine, workspaceID: workspaceID, localCache: localCache))
+    init(store: WorkspaceStore) {
+        _viewModel = State(initialValue: SettingsViewModel(store: store, localCache: LocalCacheService()))
     }
 
     var body: some View {

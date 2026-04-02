@@ -9,9 +9,9 @@ struct SidebarView: View {
     @State private var showingNewProject = false
     @State private var newProjectName = ""
 
-    init(selectedItem: Binding<ContentView.SidebarItem?>, syncEngine: SyncEngine, workspaceID: UUID) {
+    init(selectedItem: Binding<ContentView.SidebarItem?>, store: WorkspaceStore) {
         _selectedItem = selectedItem
-        _viewModel = State(initialValue: ProjectListViewModel(syncEngine: syncEngine, workspaceID: workspaceID))
+        _viewModel = State(initialValue: ProjectListViewModel(store: store))
     }
 
     var body: some View {
@@ -68,16 +68,12 @@ struct SidebarView: View {
             }
             Button("Cancel", role: .cancel) { newProjectName = "" }
         }
-        .task {
-            await viewModel.loadProjects()
-        }
         .onReceive(NotificationCenter.default.publisher(for: .newProject)) { _ in
             showingNewProject = true
         }
     }
 }
 
-// Reuse the hex Color init
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))

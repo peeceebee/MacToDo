@@ -4,27 +4,25 @@ import Storage
 import ViewModels
 
 struct ContentView: View {
-    let syncEngine: SyncEngine
-    let workspaceID: UUID
-    let localCache: LocalCacheService
+    let store: WorkspaceStore
 
     var body: some View {
         TabView {
             Tab("Tasks", systemImage: "checklist") {
                 NavigationStack {
-                    TaskListView(syncEngine: syncEngine, workspaceID: workspaceID)
+                    TaskListView(store: store)
                 }
             }
 
             Tab("Projects", systemImage: "folder.fill") {
                 NavigationStack {
-                    ProjectListView(syncEngine: syncEngine, workspaceID: workspaceID)
+                    ProjectListView(store: store)
                 }
             }
 
             Tab("Settings", systemImage: "gear") {
                 NavigationStack {
-                    SettingsView(syncEngine: syncEngine, workspaceID: workspaceID, localCache: localCache)
+                    SettingsView(store: store)
                 }
             }
         }

@@ -5,8 +5,8 @@ import ViewModels
 struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
 
-    init(syncEngine: SyncEngine, workspaceID: UUID, localCache: LocalCacheService) {
-        _viewModel = State(initialValue: SettingsViewModel(syncEngine: syncEngine, workspaceID: workspaceID, localCache: localCache))
+    init(store: WorkspaceStore) {
+        _viewModel = State(initialValue: SettingsViewModel(store: store, localCache: LocalCacheService()))
     }
 
     var body: some View {
@@ -34,12 +34,6 @@ struct SettingsView: View {
                 .disabled(viewModel.isSyncing)
             }
 
-            Section("Data") {
-                ShareLink(item: exportJSON(), preview: SharePreview("MacTodo Export", image: Image(systemName: "square.and.arrow.up")))  {
-                    Label("Export Data", systemImage: "square.and.arrow.up")
-                }
-            }
-
             Section("About") {
                 LabeledContent("Version", value: "1.0.0")
                 LabeledContent("Storage", value: "Azure Blob Storage")
@@ -49,10 +43,5 @@ struct SettingsView: View {
         .task {
             await viewModel.refresh()
         }
-    }
-
-    private func exportJSON() -> String {
-        // Synchronous placeholder — real export is async
-        "MacTodo data export"
     }
 }

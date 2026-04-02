@@ -6,15 +6,21 @@ import SwiftUI
 @MainActor
 @Observable
 public final class TaskListViewModel {
-    public var items: [TodoItem] = []
     public var filterProject: Project?
     public var filterTag: Tag?
     public var showCompleted: Bool = false
     public var searchText: String = ""
-    public var workspace: Workspace?
+
+    private let store: WorkspaceStore
+
+    public init(store: WorkspaceStore) {
+        self.store = store
+    }
+
+    public var workspace: Workspace { store.workspace }
 
     public var filteredItems: [TodoItem] {
-        items.filter { item in
+        store.items.filter { item in
             if !showCompleted && item.isCompleted { return false }
             if let filterProject, item.projectID != filterProject.id { return false }
             if let filterTag, !item.tags.contains(filterTag.id) { return false }
@@ -33,45 +39,24 @@ public final class TaskListViewModel {
         }
     }
 
-    private let syncEngine: SyncEngine
-    private let workspaceID: UUID
-
-    public init(syncEngine: SyncEngine, workspaceID: UUID) {
-        self.syncEngine = syncEngine
-        self.workspaceID = workspaceID
-    }
-
     public func loadTasks() async {
-        let ws = await syncEngine.loadWorkspace(id: workspaceID)
-        self.workspace = ws
-        self.items = ws.items
+        await store.load()
     }
 
     public func toggleCompletion(_ item: TodoItem) async {
-        guard let index = items.firstIndex(where: { $0.id == item.id }) else { return }
-        items[index].toggleCompletion()
-        await saveAll()
+        await store.toggleItemCompletion(id: item.id)
     }
 
     public func deleteTask(_ item: TodoItem) async {
-        items.removeAll { $0.id == item.id }
-        await saveAll()
+        await store.deleteItem(id: item.id)
     }
 
     public func addTask(title: String, projectID: UUID? = nil) async {
         let task = TodoItem(
             title: title,
             projectID: projectID,
-            sortOrder: items.count
+            sortOrder: store.items.count
         )
-        items.append(task)
-        await saveAll()
-    }
-
-    private func saveAll() async {
-        guard var ws = workspace else { return }
-        ws.items = items
-        self.workspace = ws
-        await syncEngine.saveWorkspace(ws)
+        await store.addItem(task)
     }
 }
