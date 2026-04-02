@@ -53,8 +53,21 @@ struct TaskDetailMacView: View {
 
             Section("Reminders (\(viewModel.item.reminders.count))") {
                 ForEach(viewModel.item.reminders) { reminder in
-                    if let date = reminder.effectiveDate(relativeTo: viewModel.item.dueDate) {
-                        Text(date, style: .date)
+                    HStack {
+                        if let date = reminder.effectiveDate(relativeTo: viewModel.item.dueDate) {
+                            Text(date, style: .date)
+                        } else {
+                            Text("Reminder")
+                        }
+                        Spacer()
+                        Button {
+                            viewModel.item.reminders.removeAll { $0.id == reminder.id }
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Remove reminder")
                     }
                 }
                 Button("Add Reminder (+1 hour)") {
