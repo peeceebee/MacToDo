@@ -20,6 +20,7 @@
 		BEF282C353391321F6E389EC /* SchedulePlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EFB6CE56BCE25817009AD6 /* SchedulePlaceholderView.swift */; };
 		D097823465548AB77FB11FD8 /* ShoppingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E56C1FF5A9ADEAAEEFD35489 /* ShoppingListView.swift */; };
 		DE66A4515B3869A9909EE38B /* TaskDetailMacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DDDCBE4CC241D3DF7F1E4C2 /* TaskDetailMacView.swift */; };
+		A1B2C3D4E5F6071823456789 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F607182345678A /* NotesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		CD71F6455900888BA4FA938C /* TodayTasksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTasksView.swift; sourceTree = "<group>"; };
 		D95B7E794BDCFD389B273532 /* TaskListMacView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListMacView.swift; sourceTree = "<group>"; };
 		E56C1FF5A9ADEAAEEFD35489 /* ShoppingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F607182345678A /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 		610864715FA415FFD6BD4439 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A1B2C3D4E5F607182345678A /* NotesView.swift */,
 				14EFB6CE56BCE25817009AD6 /* SchedulePlaceholderView.swift */,
 				00EF22AD61B64F1C3CD6EA55 /* ScheduleView.swift */,
 				8775D08A42D6DF47388E98ED /* SettingsPane.swift */,
@@ -189,6 +192,7 @@
 				3C9B304CD41315105BC40EB0 /* ContentView.swift in Sources */,
 				2F95E80706E042C9B2D62AB8 /* MacTodoMacApp.swift in Sources */,
 				BEF282C353391321F6E389EC /* SchedulePlaceholderView.swift in Sources */,
+				A1B2C3D4E5F6071823456789 /* NotesView.swift in Sources */,
 				B35A1658A7364C49FB4921F8 /* ScheduleView.swift in Sources */,
 				4C6458313B06C59B260FEBA0 /* SettingsPane.swift in Sources */,
 				D097823465548AB77FB11FD8 /* ShoppingListView.swift in Sources */,

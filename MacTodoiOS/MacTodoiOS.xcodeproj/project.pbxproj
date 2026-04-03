@@ -18,6 +18,7 @@
 		DF2934BB8A05667CB72C75D7 /* TaskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18517C29CDCDC55C05767B23 /* TaskListView.swift */; };
 		E315C55039C13BEC87B42E55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7825B20548A5ECF994D2D4 /* ContentView.swift */; };
 		E5F8F0407A5A008B58947B8B /* ScheduleiOSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3233710E31D444D0ABAC12 /* ScheduleiOSView.swift */; };
+		F1A2B3C4D5E6F70812345678 /* NotesiOSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70812345679 /* NotesiOSView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		B3A4E6362ACCF53533A4CF9B /* MacTodoCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MacTodoCore; path = ../MacTodoCore; sourceTree = SOURCE_ROOT; };
 		CC856192AE540E7CC7113C25 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
 		D1A369D488DA826A138C9E68 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6F70812345679 /* NotesiOSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesiOSView.swift; sourceTree = "<group>"; };
 		F828796E256BEA4F81434508 /* MacTodoiOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MacTodoiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -50,6 +52,7 @@
 		4E38CF10EB4D3BBD8874B199 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F1A2B3C4D5E6F70812345679 /* NotesiOSView.swift */,
 				9D288C2742325DD83885F6CF /* ProjectListView.swift */,
 				5C3233710E31D444D0ABAC12 /* ScheduleiOSView.swift */,
 				D1A369D488DA826A138C9E68 /* SettingsView.swift */,
@@ -183,6 +186,7 @@
 				E315C55039C13BEC87B42E55 /* ContentView.swift in Sources */,
 				C157D722A59F15943EABDA7D /* MacTodoiOSApp.swift in Sources */,
 				A2870D3794E539D78DF07DD3 /* ProjectListView.swift in Sources */,
+				F1A2B3C4D5E6F70812345678 /* NotesiOSView.swift in Sources */,
 				E5F8F0407A5A008B58947B8B /* ScheduleiOSView.swift in Sources */,
 				240B4F4CE57DFE2585A7F444 /* SettingsView.swift in Sources */,
 				5A8775988CB4C09343C9696F /* ShoppingListiOSView.swift in Sources */,
