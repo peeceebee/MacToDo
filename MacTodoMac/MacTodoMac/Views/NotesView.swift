@@ -47,9 +47,9 @@ struct NotesView: View {
                     TextField("Title", text: $newTitle)
                         .textFieldStyle(.roundedBorder)
 
-                    TextField("Contents", text: $newContents, axis: .vertical)
-                        .textFieldStyle(.roundedBorder)
-                        .lineLimit(3...6)
+                    TextEditor(text: $newContents)
+                        .frame(minHeight: 60)
+                        .border(Color.secondary.opacity(0.3))
 
                     TextField("URL / Phone (optional)", text: $newContactInfo)
                         .textFieldStyle(.roundedBorder)

@@ -19,8 +19,8 @@ struct NotesiOSView: View {
             if showingAddPanel {
                 Section {
                     TextField("Title", text: $newTitle)
-                    TextField("Contents", text: $newContents, axis: .vertical)
-                        .lineLimit(3...6)
+                    TextEditor(text: $newContents)
+                        .frame(minHeight: 80)
                     TextField("URL / Phone (optional)", text: $newContactInfo)
                         .keyboardType(.default)
 
