@@ -5,8 +5,8 @@ import ViewModels
 struct ScheduleiOSView: View {
     let store: WorkspaceStore
 
+    @Binding var dayRange: Int
     @State private var showingAddPanel = false
-    @State private var dayRange: Int = 7
     @State private var newTitle = ""
     @State private var newDate = Date()
     @State private var newType: ScheduleEventType = .other

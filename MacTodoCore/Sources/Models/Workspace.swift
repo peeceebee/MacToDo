@@ -9,6 +9,7 @@ public struct Workspace: Codable, Sendable, Hashable, Identifiable {
     public var collaborators: [Collaborator]
     public var shoppingItems: [ShoppingItem]
     public var scheduleEvents: [ScheduleEvent]
+    public var notes: [Note]
 
     public init(
         id: UUID = UUID(),
@@ -18,7 +19,8 @@ public struct Workspace: Codable, Sendable, Hashable, Identifiable {
         tags: [Tag] = [],
         collaborators: [Collaborator] = [],
         shoppingItems: [ShoppingItem] = [],
-        scheduleEvents: [ScheduleEvent] = []
+        scheduleEvents: [ScheduleEvent] = [],
+        notes: [Note] = []
     ) {
         self.id = id
         self.lastModified = lastModified
@@ -28,6 +30,7 @@ public struct Workspace: Codable, Sendable, Hashable, Identifiable {
         self.collaborators = collaborators
         self.shoppingItems = shoppingItems
         self.scheduleEvents = scheduleEvents
+        self.notes = notes
     }
 
     // Custom decoder for backward compatibility
@@ -41,6 +44,7 @@ public struct Workspace: Codable, Sendable, Hashable, Identifiable {
         collaborators  = try container.decode([Collaborator].self, forKey: .collaborators)
         shoppingItems  = try container.decodeIfPresent([ShoppingItem].self, forKey: .shoppingItems) ?? []
         scheduleEvents = try container.decodeIfPresent([ScheduleEvent].self, forKey: .scheduleEvents) ?? []
+        notes          = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
     }
 
     public mutating func touch() {
