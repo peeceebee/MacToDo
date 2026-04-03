@@ -144,4 +144,21 @@ public final class WorkspaceStore {
             await save()
         }
     }
+
+    // MARK: - Schedule Events
+
+    public var scheduleEvents: [ScheduleEvent] {
+        get { workspace.scheduleEvents }
+        set { workspace.scheduleEvents = newValue }
+    }
+
+    public func addScheduleEvent(_ event: ScheduleEvent) async {
+        workspace.scheduleEvents.append(event)
+        await save()
+    }
+
+    public func deleteScheduleEvent(id: UUID) async {
+        workspace.scheduleEvents.removeAll { $0.id == id }
+        await save()
+    }
 }

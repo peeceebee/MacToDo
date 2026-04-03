@@ -16,12 +16,14 @@
 		50A24DC3C7211C9304C441A2 /* ViewModels in Frameworks */ = {isa = PBXBuildFile; productRef = 99D41ECFBEDE7E27F2EAFA14 /* ViewModels */; };
 		635B50A06B9EE79E81C5462F /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D4305A0F894EF926BE4059 /* SidebarView.swift */; };
 		AF20E48F75E67C3250A09C73 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = FCCA5E8489693A6C6E75CEA3 /* Models */; };
+		B35A1658A7364C49FB4921F8 /* ScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EF22AD61B64F1C3CD6EA55 /* ScheduleView.swift */; };
 		BEF282C353391321F6E389EC /* SchedulePlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EFB6CE56BCE25817009AD6 /* SchedulePlaceholderView.swift */; };
 		D097823465548AB77FB11FD8 /* ShoppingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E56C1FF5A9ADEAAEEFD35489 /* ShoppingListView.swift */; };
 		DE66A4515B3869A9909EE38B /* TaskDetailMacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DDDCBE4CC241D3DF7F1E4C2 /* TaskDetailMacView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		00EF22AD61B64F1C3CD6EA55 /* ScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleView.swift; sourceTree = "<group>"; };
 		0DDDCBE4CC241D3DF7F1E4C2 /* TaskDetailMacView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailMacView.swift; sourceTree = "<group>"; };
 		11658C9930C1115275F74867 /* MacTodoMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacTodoMacApp.swift; sourceTree = "<group>"; };
 		14EFB6CE56BCE25817009AD6 /* SchedulePlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulePlaceholderView.swift; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				14EFB6CE56BCE25817009AD6 /* SchedulePlaceholderView.swift */,
+				00EF22AD61B64F1C3CD6EA55 /* ScheduleView.swift */,
 				8775D08A42D6DF47388E98ED /* SettingsPane.swift */,
 				E56C1FF5A9ADEAAEEFD35489 /* ShoppingListView.swift */,
 				60D4305A0F894EF926BE4059 /* SidebarView.swift */,
@@ -186,6 +189,7 @@
 				3C9B304CD41315105BC40EB0 /* ContentView.swift in Sources */,
 				2F95E80706E042C9B2D62AB8 /* MacTodoMacApp.swift in Sources */,
 				BEF282C353391321F6E389EC /* SchedulePlaceholderView.swift in Sources */,
+				B35A1658A7364C49FB4921F8 /* ScheduleView.swift in Sources */,
 				4C6458313B06C59B260FEBA0 /* SettingsPane.swift in Sources */,
 				D097823465548AB77FB11FD8 /* ShoppingListView.swift in Sources */,
 				635B50A06B9EE79E81C5462F /* SidebarView.swift in Sources */,

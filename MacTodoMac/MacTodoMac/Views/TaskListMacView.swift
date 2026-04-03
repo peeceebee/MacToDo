@@ -81,6 +81,18 @@ struct TaskListMacView: View {
                             .foregroundStyle(priorityColor(item.priority))
                             .clipShape(Capsule())
                     }
+
+                    Button {
+                        Task {
+                            await viewModel.deleteTask(item)
+                            if selectedTask?.id == item.id { selectedTask = nil }
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Delete task")
                 }
                 .tag(item)
             }
