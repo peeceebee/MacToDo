@@ -161,4 +161,30 @@ public final class WorkspaceStore {
         workspace.scheduleEvents.removeAll { $0.id == id }
         await save()
     }
+
+    // MARK: - Notes
+
+    public var notes: [Note] {
+        get { workspace.notes }
+        set { workspace.notes = newValue }
+    }
+
+    public func addNote(_ note: Note) async {
+        workspace.notes.append(note)
+        await save()
+    }
+
+    public func updateNote(_ note: Note) async {
+        if let index = workspace.notes.firstIndex(where: { $0.id == note.id }) {
+            var updated = note
+            updated.updatedAt = Date()
+            workspace.notes[index] = updated
+            await save()
+        }
+    }
+
+    public func deleteNote(id: UUID) async {
+        workspace.notes.removeAll { $0.id == id }
+        await save()
+    }
 }

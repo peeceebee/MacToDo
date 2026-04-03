@@ -46,6 +46,9 @@ struct SidebarView: View {
             Label("Schedule", systemImage: "calendar")
                 .tag(ContentView.SidebarItem.schedule)
 
+            Label("Notes", systemImage: "note.text")
+                .tag(ContentView.SidebarItem.notes)
+
             DisclosureGroup {
                 ForEach(viewModel.projects) { project in
                     Label {

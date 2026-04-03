@@ -14,6 +14,7 @@ struct ContentView: View {
         case pastDueDo
         case shoppingList
         case schedule
+        case notes
         case todoList(Project)
     }
 
@@ -29,6 +30,8 @@ struct ContentView: View {
                 ShoppingListView(store: store)
             case .schedule:
                 ScheduleView(store: store)
+            case .notes:
+                NotesView(store: store)
             case .todaysTodo:
                 TodayTasksView(mode: .today, selectedTask: $selectedTask, store: store)
             case .pastDueDo:
