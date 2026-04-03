@@ -169,7 +169,7 @@ struct ScheduleView: View {
 
     private func iconColor(_ type: ScheduleEventType) -> Color {
         switch type {
-        case .birthday:    return .pink
+        case .birthday:    return .green
         case .anniversary: return .red
         case .other:       return .blue
         }
