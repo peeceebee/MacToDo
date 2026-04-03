@@ -55,8 +55,14 @@ struct TaskListMacView: View {
                     .buttonStyle(.plain)
 
                     VStack(alignment: .leading) {
-                        Text(item.title)
-                            .strikethrough(item.isCompleted)
+                        HStack(spacing: 2) {
+                            if !item.assigneePrefix.isEmpty {
+                                Text(item.assigneePrefix)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Text(item.title)
+                        }
+                        .strikethrough(item.isCompleted)
                         if let dueDate = item.dueDate {
                             Text(dueDate, style: .date)
                                 .font(.caption)

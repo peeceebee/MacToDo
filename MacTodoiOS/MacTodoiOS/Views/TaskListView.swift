@@ -119,9 +119,15 @@ private struct TaskRow: View {
                 .foregroundStyle(item.isCompleted ? .green : .secondary)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.title)
-                    .strikethrough(item.isCompleted)
-                    .foregroundStyle(item.isCompleted ? .secondary : .primary)
+                HStack(spacing: 2) {
+                    if !item.assigneePrefix.isEmpty {
+                        Text(item.assigneePrefix)
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(item.title)
+                }
+                .strikethrough(item.isCompleted)
+                .foregroundStyle(item.isCompleted ? .secondary : .primary)
 
                 if let dueDate = item.dueDate {
                     Text(dueDate, style: .date)
