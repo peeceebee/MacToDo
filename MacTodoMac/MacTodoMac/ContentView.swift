@@ -28,7 +28,7 @@ struct ContentView: View {
             case .shoppingList:
                 ShoppingListView(store: store)
             case .schedule:
-                SchedulePlaceholderView()
+                ScheduleView(store: store)
             case .todaysTodo:
                 TodayTasksView(mode: .today, selectedTask: $selectedTask, store: store)
             case .pastDueDo:

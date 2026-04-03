@@ -2,11 +2,11 @@ import SwiftUI
 import Models
 import ViewModels
 
-struct ScheduleiOSView: View {
+struct ScheduleView: View {
     let store: WorkspaceStore
 
     @State private var showingAddPanel = false
-    @State private var dayRange: Int = 7
+    @State private var dayRange: Int = 7          // cycles 7 → 14 → 30
     @State private var newTitle = ""
     @State private var newDate = Date()
     @State private var newType: ScheduleEventType = .other
@@ -23,19 +23,63 @@ struct ScheduleiOSView: View {
     }
 
     var body: some View {
-        List {
-            // ── Add panel (first section when open) ─────────────────
+        VStack(spacing: 0) {
+            // ── Header bar ──────────────────────────────────────────
+            HStack {
+                Text("Schedule")
+                    .font(.title2.weight(.semibold))
+
+                Spacer()
+
+                // Day-range badge: circle with 7 / 14 / 30
+                Button {
+                    cycleDayRange()
+                } label: {
+                    ZStack {
+                        Circle()
+                            .strokeBorder(.secondary, lineWidth: 1.5)
+                            .frame(width: 28, height: 28)
+                        Text("\(dayRange)")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.primary)
+                    }
+                }
+                .buttonStyle(.plain)
+                .help("Showing next \(dayRange) days — click to change")
+
+                // Add / close panel button
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showingAddPanel.toggle()
+                        if !showingAddPanel { resetForm() }
+                    }
+                } label: {
+                    Image(systemName: showingAddPanel ? "xmark" : "plus")
+                        .frame(width: 16, height: 16)
+                }
+                .buttonStyle(.borderless)
+                .help(showingAddPanel ? "Cancel" : "Add event")
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+
+            Divider()
+
+            // ── Add panel ───────────────────────────────────────────
             if showingAddPanel {
-                Section {
+                VStack(alignment: .leading, spacing: 8) {
                     TextField("Event title", text: $newTitle)
+                        .textFieldStyle(.roundedBorder)
 
                     DatePicker("Date", selection: $newDate, displayedComponents: [.date])
+                        .labelsHidden()
 
                     Picker("Type", selection: $newType) {
                         ForEach(ScheduleEventType.allCases, id: \.self) { t in
                             Label(t.rawValue, systemImage: t.icon).tag(t)
                         }
                     }
+                    .pickerStyle(.segmented)
 
                     Button("Add Event") {
                         guard !newTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
@@ -46,24 +90,29 @@ struct ScheduleiOSView: View {
                         )
                         Task {
                             await store.addScheduleEvent(event)
-                            showingAddPanel = false
+                            withAnimation { showingAddPanel = false }
                             resetForm()
                         }
                     }
+                    .buttonStyle(.borderedProminent)
                     .disabled(newTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
+                .padding()
+                .background(Color(nsColor: .controlBackgroundColor))
+
+                Divider()
             }
 
             // ── Event list ──────────────────────────────────────────
-            if filteredEvents.isEmpty && !showingAddPanel {
-                ContentUnavailableView(
-                    "No Events in \(dayRange) Days",
-                    systemImage: "calendar",
-                    description: Text("Tap + to add a birthday, anniversary, or other event.")
-                )
-                .listRowSeparator(.hidden)
-            } else {
-                Section {
+            List {
+                if filteredEvents.isEmpty {
+                    ContentUnavailableView(
+                        "No Events in \(dayRange) Days",
+                        systemImage: "calendar",
+                        description: Text("Press + to add a birthday, anniversary, or other event.")
+                    )
+                    .listRowSeparator(.hidden)
+                } else {
                     ForEach(filteredEvents) { event in
                         HStack(spacing: 10) {
                             Image(systemName: event.type.icon)
@@ -72,6 +121,7 @@ struct ScheduleiOSView: View {
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(event.title)
+                                    .font(.body)
                                 Text(event.date, style: .date)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -94,37 +144,10 @@ struct ScheduleiOSView: View {
                                     .foregroundStyle(.secondary)
                             }
                             .buttonStyle(.plain)
+                            .help("Remove event")
                         }
                         .padding(.vertical, 2)
                     }
-                }
-            }
-        }
-        .navigationTitle("Schedule")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .primaryAction) {
-                // Day-range badge
-                Button {
-                    cycleDayRange()
-                } label: {
-                    ZStack {
-                        Circle()
-                            .strokeBorder(.secondary, lineWidth: 1.5)
-                            .frame(width: 26, height: 26)
-                        Text("\(dayRange)")
-                            .font(.system(size: 11, weight: .semibold))
-                    }
-                }
-
-                // Add / dismiss button
-                Button {
-                    withAnimation {
-                        showingAddPanel.toggle()
-                        if !showingAddPanel { resetForm() }
-                    }
-                } label: {
-                    Image(systemName: showingAddPanel ? "xmark" : "plus")
                 }
             }
         }

@@ -51,7 +51,13 @@ struct TodayTasksView: View {
                 .buttonStyle(.plain)
 
                 VStack(alignment: .leading) {
-                    Text(item.title)
+                    HStack(spacing: 2) {
+                        if !item.assigneePrefix.isEmpty {
+                            Text(item.assigneePrefix)
+                                .foregroundStyle(.secondary)
+                        }
+                        Text(item.title)
+                    }
                     HStack(spacing: 4) {
                         if let dueDate = item.dueDate {
                             Text(dueDate, style: .date)

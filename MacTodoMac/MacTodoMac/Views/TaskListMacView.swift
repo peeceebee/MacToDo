@@ -55,8 +55,14 @@ struct TaskListMacView: View {
                     .buttonStyle(.plain)
 
                     VStack(alignment: .leading) {
-                        Text(item.title)
-                            .strikethrough(item.isCompleted)
+                        HStack(spacing: 2) {
+                            if !item.assigneePrefix.isEmpty {
+                                Text(item.assigneePrefix)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Text(item.title)
+                        }
+                        .strikethrough(item.isCompleted)
                         if let dueDate = item.dueDate {
                             Text(dueDate, style: .date)
                                 .font(.caption)
@@ -75,6 +81,18 @@ struct TaskListMacView: View {
                             .foregroundStyle(priorityColor(item.priority))
                             .clipShape(Capsule())
                     }
+
+                    Button {
+                        Task {
+                            await viewModel.deleteTask(item)
+                            if selectedTask?.id == item.id { selectedTask = nil }
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Delete task")
                 }
                 .tag(item)
             }

@@ -16,7 +16,7 @@ struct ContentView: View {
 
             Tab("Schedule", systemImage: "calendar") {
                 NavigationStack {
-                    ScheduleiOSView()
+                    ScheduleiOSView(store: store)
                 }
             }
 

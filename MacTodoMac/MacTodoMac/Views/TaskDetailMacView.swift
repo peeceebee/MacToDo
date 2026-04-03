@@ -36,6 +36,13 @@ struct TaskDetailMacView: View {
                     get: { viewModel.item.dueDate != nil },
                     set: { viewModel.item.dueDate = $0 ? Date() : nil }
                 ))
+
+                TextField("Assignee", text: Binding(
+                    get: { viewModel.item.assignee ?? "" },
+                    set: { viewModel.item.assignee = $0.isEmpty ? nil : $0 }
+                ))
+                .textFieldStyle(.roundedBorder)
+                .help("Enter initials (PB), two initials (AB), or a name. Shows as (XYZ) in task lists.")
             }
 
             Section("Recurrence") {
